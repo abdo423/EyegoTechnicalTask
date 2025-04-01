@@ -1,22 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, PointElement, LineElement } from "chart.js";
 import { Bar, Line } from "react-chartjs-2";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "@/Store/store";
+import { getProducts } from "@/Store/Reducers/productsSlice";
 
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, PointElement, LineElement);
 
 const ChartComponent = () => {
+  const dispatch = useDispatch<AppDispatch>();
   const [chartType, setChartType] = useState<"bar" | "line">("bar");
 
-  // Sample Data
+  // Get products from Redux store
+  const { products, loading, error } = useSelector((state: RootState) => state.products);
+
+  useEffect(() => {
+    dispatch(getProducts());
+  }, [dispatch]);
+
+  // Transform data for the chart
+  const labels = products.map((product) => product.title); // Example: product names as labels
+  const salesData = products.map((product) => product.price || 0); // Example: sales data
+
   const chartData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+    labels,
     datasets: [
       {
         label: "Sales",
-        data: [120, 190, 300, 250, 400, 350],
+        data: salesData,
         backgroundColor: chartType === "bar" ? "rgba(59, 130, 246, 0.7)" : "rgba(59, 130, 246, 0.3)",
         borderColor: "rgba(59, 130, 246, 1)",
         borderWidth: chartType === "line" ? 2 : 0,
@@ -53,7 +67,15 @@ const ChartComponent = () => {
         </div>
       </div>
 
-      {chartType === "bar" ? <Bar data={chartData} options={chartOptions} /> : <Line data={chartData} options={chartOptions} />}
+      {loading ? (
+        <p className="text-center text-gray-500">Loading...</p>
+      ) : error ? (
+        <p className="text-center text-red-500">Error: {error}</p>
+      ) : (
+        <>
+          {chartType === "bar" ? <Bar data={chartData} options={chartOptions} /> : <Line data={chartData} options={chartOptions} />}
+        </>
+      )}
     </div>
   );
 };
