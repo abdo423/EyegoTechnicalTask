@@ -1,3 +1,4 @@
+import ChartComponent from "@/components/Chart";
 import DashboardTable from "@/components/dashboard-table";
 import Navbar from "@/components/Navbar";
 import PageHeader from "@/components/page-header";
@@ -11,8 +12,8 @@ export default function Home() {
       <div className="flex flex-col flex-1">
         <Navbar />
         <div className="flex-1 p-4">
-          < PageHeader text="Dashboard"/>
-          <DashboardTable />
+          <PageHeader text="Analytics" />
+          <ChartComponent />
         </div>
       </div>
     </div>
